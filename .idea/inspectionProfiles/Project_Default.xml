@@ -1,0 +1,30 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="apache-airflow-providers-redis" />
+          <option value="apache-airflow-providers-celery" />
+          <option value="apache-airflow-providers-http" />
+          <option value="apache-airflow-providers-ssh" />
+          <option value="apache-airflow-providers-sftp" />
+          <option value="apache-airflow-providers-ftp" />
+          <option value="apache-airflow-providers-google" />
+          <option value="apache-airflow-providers-amazon" />
+          <option value="apache-airflow-providers-apache-spark" />
+          <option value="apache-airflow-providers-apache-kafka" />
+          <option value="apache-airflow-providers-docker" />
+          <option value="apache-airflow-providers-slack" />
+          <option value="apache-airflow-providers-microsoft-azure" />
+          <option value="apache-airflow-providers-elasticsearch" />
+          <option value="redis" />
+          <option value="black" />
+          <option value="flake8" />
+          <option value="pytest" />
+          <option value="pytest-cov" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
