@@ -6,8 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="baf14246-5135-4aff-a31a-23e36332dafb" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/airflow.cfg" beforeDir="false" afterPath="$PROJECT_DIR$/config/airflow.cfg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/init-scripts/01_setup.sql" beforeDir="false" afterPath="$PROJECT_DIR$/init-scripts/01_setup.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
