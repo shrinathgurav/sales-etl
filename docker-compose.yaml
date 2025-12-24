@@ -64,6 +64,14 @@ x-airflow-common:
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__CORE__EXECUTION_API_SERVER_URL: 'http://airflow-apiserver:8080/execution/'
+    AIRFLOW_CONN_ORACLE_DB_YT_ELT: 'oracle://${ETL_DATABASE_USERNAME}:${ETL_DATABASE_PASSWORD}@${ETL_CONN_HOST}:${ETL_CONN_PORT}/${ETL_DATABASE_NAME}'
+    ORACLE_PASSWORD: ${ORACLE_PASSWORD}
+    ETL_DATABASE_NAME: ${ETL_DATABASE_NAME}
+    ETL_DATABASE_USERNAME: ${ETL_DATABASE_USERNAME}
+    ETL_DATABASE_PASSWORD: ${ETL_DATABASE_PASSWORD}
+    ETL_CONN_HOST: ${ETL_CONN_HOST}
+    ETL_CONN_PORT: ${ETL_CONN_PORT}
+    ORACLE_CONTAINER_DB : ${ORACLE_CONTAINER_DB}
     # yamllint disable rule:line-length
     # Use simple http server on scheduler for health checks
     # See https://airflow.apache.org/docs/apache-airflow/stable/administration-and-deployment/logging-monitoring/check-health.html#scheduler-health-check-server
@@ -82,6 +90,7 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/data:/opt/airflow/data
     - ${AIRFLOW_PROJ_DIR:-.}/include:/opt/airflow/include
     - ${AIRFLOW_PROJ_DIR:-.}/init-scripts:/opt/airflow/init-scripts
+    - ${AIRFLOW_PROJ_DIR:-.}/db_scripts:/opt/airflow/db_scripts
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -89,10 +98,13 @@ x-airflow-common:
       condition: service_healthy
     postgres:
       condition: service_healthy
+    oracle:
+      condition: service_healthy
 
 services:
   postgres:
     image: postgres:16
+    container_name: postgres_sales_etl
     environment:
       POSTGRES_USER: airflow
       POSTGRES_PASSWORD: airflow
@@ -122,14 +134,17 @@ services:
   oracle:
     # Docker Hub image (feel free to change the tag "latest" to any other available one)
     image: gvenzl/oracle-free:latest
+    container_name: oracle_sales_etl
     # Forward Oracle port to localhost
     ports:
       - "1521:1521"
     # Provide passwords and other environment variables to the container
     environment:
-      ORACLE_PASSWORD: ${ORACLE_PASSWORD}
-      APP_USER: ${APP_USER}
-      APP_USER_PASSWORD: ${APP_USER_PASSWORD}
+        - ORACLE_PASSWORD=${ORACLE_PASSWORD}
+        - ETL_DATABASE_NAME=${ETL_DATABASE_NAME}
+        - ETL_DATABASE_USERNAME=${ETL_DATABASE_USERNAME}
+        - ETL_DATABASE_PASSWORD=${ETL_DATABASE_PASSWORD}
+        - ORACLE_CONTAINER_DB=${ORACLE_CONTAINER_DB}
     # Customize healthcheck script options for startup
     healthcheck:
       test: [ "CMD", "healthcheck.sh" ]
@@ -140,7 +155,7 @@ services:
       start_interval: 5s
     # Mount a local SQL file to initialize your schema at startup
     volumes:
-      - /init-scripts:/container-entrypoint-initdb.d/
+      - ./init-scripts:/container-entrypoint-initdb.d/
 
   redis:
     # Redis is limited to 7.2-bookworm due to licencing change
@@ -296,14 +311,14 @@ services:
         echo
         echo "Creating missing opt dirs if missing:"
         echo
-        mkdir -v -p /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts}
+        mkdir -v -p /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts,db_scripts}
         echo
         echo "Airflow version:"
         /entrypoint airflow version
         echo
         echo "Files in shared volumes:"
         echo
-        ls -la /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts}
+        ls -la /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts,db_scripts}
         echo
         echo "Running airflow config list to create default config file if missing."
         echo
@@ -311,7 +326,7 @@ services:
         echo
         echo "Files in shared volumes:"
         echo
-        ls -la /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts}
+        ls -la /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts,db_scripts}
         echo
         echo "Change ownership of files in /opt/airflow to ${AIRFLOW_UID}:0"
         echo
@@ -319,11 +334,11 @@ services:
         echo
         echo "Change ownership of files in shared volumes to ${AIRFLOW_UID}:0"
         echo
-        chown -v -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts}
+        chown -v -R "${AIRFLOW_UID}:0" /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts,db_scripts}
         echo
         echo "Files in shared volumes:"
         echo
-        ls -la /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts}
+        ls -la /opt/airflow/{logs,dags,plugins,config,include,data,init-scripts,db_scripts}
 
     # yamllint enable rule:line-length
     environment:
